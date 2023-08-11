@@ -358,6 +358,50 @@
          (apply str))))
 
 (encode-dups "din") ;; -> "((("
+
 (encode-dups "recede") ;; -> "()()()"
 
 ;; --------------------
+
+;;;; Sum of Digits / Digital Root (6 kyu)
+
+;; Digital root is the recursive sum of all the digits in a number.
+
+;; Given n, take the sum of the digits of n. If that value has more than one digit, continue reducing in this way until a single-digit number is produced. The input will be a non-negative integer.
+
+;; Examples
+;;     16  -->  1 + 6 = 7
+;;    942  -->  9 + 4 + 2 = 15  -->  1 + 5 = 6
+;; 132189  -->  1 + 3 + 2 + 1 + 8 + 9 = 24  -->  2 + 4 = 6
+;; 493193  -->  4 + 9 + 3 + 1 + 9 + 3 = 29  -->  2 + 9 = 11  -->  1 + 1 = 2
+
+(defn ->digits [number]
+  (->> number
+       (iterate #(quot % 10))
+       (take-while pos?)
+       (map #(rem % 10))))
+
+(defn digits-sum [number]
+  (->> number ->digits (reduce +)))
+
+(digits-sum 942)
+
+;; Solution with loop
+;; (defn digital-root [number]
+;;   (loop [sum (digits-sum number)]
+;;     (if (zero? (quot sum 10))
+;;       sum
+;;       (recur (digits-sum sum)))))
+
+;; Solution with iterate
+(defn digital-root [number]
+  (->> number
+       (iterate digits-sum)
+       (drop-while #(> (quot % 10) 0))
+       first))
+
+;; Clever solution from codewars. I am not good at math unfortunately
+;; (defn digital-root [n]
+;;   (if (> n 0) (+ 1 (mod (- n 1) 9)) 0))
+
+(digital-root 493193) ;; -> 2
